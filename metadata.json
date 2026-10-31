@@ -1,0 +1,6 @@
+{
+  "name": "PrivacyLint",
+  "description": "Deterministic privacy and security code analysis platform mapping personal data flows, DPDP engineering triage, and bounded AI remediation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

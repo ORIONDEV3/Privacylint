@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "1.2.0",
+  "engine": "PrivacyLint Deterministic AST & Pattern Rule Engine",
+  "jurisdictionContext": "India DPDP Act 2023 (Engineering Triage Mapping — Non-Legal Advisory)",
+  "lastUpdated": "2026-10-30",
+  "rules": [
+    {
+      "id": "PL-DPDP-001",
+      "name": "Missing Consent Verification on PII-Touching Route",
+      "category": "Consent & Lawful Processing",
+      "severity": "Critical",
+      "dpdpReference": "DPDP Act §6(1) — Consent & Notice Requirement",
+      "description": "API route handler ingests or processes Personal Identifiable Information (email, phone, Aadhaar, PAN, fullName) from request payload without invoking a consent verification middleware or checking explicit user consent flags.",
+      "detectionLogic": "AST Route Handler Inspection: Identifies Express route definitions (POST/PUT/PATCH) destructuring PII identifiers from req.body without a preceding verifyConsent middleware or consent_timestamp check in the handler scope.",
+      "affectedSinkType": "Controller / Database Write",
+      "remediationSummary": "Insert explicit consent verification middleware (e.g., requireConsent('checkout_pii_processing')) before route controller execution and persist the verified consent artifact ID."
+    },
+    {
+      "id": "PL-DPDP-002",
+      "name": "Plaintext PII Written to Application Logs",
+      "category": "Data Minimisation & Leakage",
+      "severity": "Critical",
+      "dpdpReference": "DPDP Act §8(5) — Reasonable Security Safeguards",
+      "description": "Unmasked personal identifiers (email, phone, panNumber, aadhaarNumber, or full req.body) are passed directly to console.log, console.info, or logger sinks, leaking cleartext PII into log aggregators.",
+      "detectionLogic": "AST CallExpression Sink Analysis: Matches logger/console method invocations whose arguments reference PII variable bindings or raw request payloads without redaction helpers.",
+      "affectedSinkType": "Logger / Telemetry Sink",
+      "remediationSummary": "Replace raw object/PII logging with a structured redaction utility (e.g., redactPII(payload)) or log only non-sensitive correlation IDs."
+    },
+    {
+      "id": "PL-DPDP-003",
+      "name": "Unprotected PII Stored in Browser localStorage/sessionStorage",
+      "category": "Client-Side Storage Security",
+      "severity": "High",
+      "dpdpReference": "DPDP Act §8(5) — Protection Against Unauthorized Access",
+      "description": "Sensitive user profile attributes or session tokens containing PII are serialized directly into window.localStorage or window.sessionStorage, exposing them to XSS exfiltration.",
+      "detectionLogic": "AST MemberExpression Check: Detects localStorage.setItem or sessionStorage.setItem calls where the key or serialized value contains phone, email, kyc, pan, or token identifiers.",
+      "affectedSinkType": "Browser Storage Sink",
+      "remediationSummary": "Store session state in HttpOnly, Secure, SameSite=Strict server cookies and keep sensitive KYC/PII attributes in ephemeral memory only when actively rendered."
+    },
+    {
+      "id": "PL-DPDP-004",
+      "name": "PII Database Table Without Retention or TTL Policy Signal",
+      "category": "Storage Limitation & Erasure",
+      "severity": "High",
+      "dpdpReference": "DPDP Act §8(7) — Erasure & Retention Limitation",
+      "description": "Database schema or ORM model storing personal data lacks an explicit retention timestamp (expires_at, retention_until, deleted_at) or scheduled purge policy annotation.",
+      "detectionLogic": "Schema & DDL Inspection: Parses CREATE TABLE / ORM model definitions containing PII columns (email, phone, pan_number, aadhaar_last4) and verifies presence of TTL/retention columns or purge triggers.",
+      "affectedSinkType": "PostgreSQL Database Table",
+      "remediationSummary": "Add a retention_until TIMESTAMPTZ column and register the table in the automated data-retention purge worker when the specified purpose is fulfilled."
+    },
+    {
+      "id": "PL-DPDP-005",
+      "name": "Unmasked PII Forwarded to Third-Party Analytics",
+      "category": "Third-Party Data Sharing",
+      "severity": "High",
+      "dpdpReference": "DPDP Act §8(2) — Data Processor & Third-Party Safeguards",
+      "description": "User email, mobile number, or government ID is transmitted directly inside analytics.track() or third-party marketing webhook payloads without hashing or pseudonymization.",
+      "detectionLogic": "AST External Call Graph: Tracks taint flow from user entity fields into analytics.track, mixpanel.people.set, segment.identify, or external axios.post calls.",
+      "affectedSinkType": "External Analytics API",
+      "remediationSummary": "Strip direct PII attributes from analytics payloads and use an anonymized internal UUID or salted SHA-256 hash when correlation is strictly consented."
+    },
+    {
+      "id": "PL-DPDP-006",
+      "name": "Unconsented Third-Party Tracker Loaded on Application Route",
+      "category": "Tracking & Notice",
+      "severity": "Medium",
+      "dpdpReference": "DPDP Act §5 & §6 — Notice Prior to Collection",
+      "description": "Third-party tracking pixels or telemetry scripts are initialized unconditionally on route render prior to verifying the user's opt-in tracking preference.",
+      "detectionLogic": "AST Script/Tracker Initialization Check: Identifies unconditional invocation of third-party pixel/beacon initializers without a gating hasTrackingConsent() guard.",
+      "affectedSinkType": "External Tracker Beacon",
+      "remediationSummary": "Gate all non-essential third-party tracker initializations behind an explicit consent state check."
+    },
+    {
+      "id": "PL-DPDP-007",
+      "name": "Missing Age-Gate / Verifiable Parental Consent Signal in Signup Flow",
+      "category": "Children's Personal Data",
+      "severity": "High",
+      "dpdpReference": "DPDP Act §9(1) — Processing of Personal Data of Children",
+      "description": "User registration or onboarding controller accepts dateOfBirth or creates user accounts without checking whether the user is a minor (<18 years) or requiring verifiable guardian consent.",
+      "detectionLogic": "Signup AST Flow Analysis: Inspects registration endpoints accepting user profile creation without age calculation or minor guardian-consent verification branches.",
+      "affectedSinkType": "Onboarding Controller",
+      "remediationSummary": "Validate dateOfBirth at registration; if age < 18, halt standard onboarding and trigger the Verifiable Parental Consent (VPC) workflow."
+    },
+    {
+      "id": "PL-DPDP-008",
+      "name": "Missing Breach-Notification Incident Hook on Sensitive Data Store",
+      "category": "Incident Response & Governance",
+      "severity": "Medium",
+      "dpdpReference": "DPDP Act §8(6) — Personal Data Breach Intimation",
+      "description": "Authentication and bulk PII data access modules lack structured security event hooks or anomaly alert triggers required for CERT-In / Data Protection Board breach reporting.",
+      "detectionLogic": "Security Control Signal Check: Inspects error/unauthorized access handlers on critical PII controllers for audit log and incident alert dispatch calls.",
+      "affectedSinkType": "Security Audit Subsystem",
+      "remediationSummary": "Wire unauthorized access and bulk-query anomaly events to the SecurityAuditLogger and CERT-In / DPB incident notification webhook."
+    },
+    {
+      "id": "PL-DPDP-009",
+      "name": "Sensitive PII & Credential Fields Exposed in API Response",
+      "category": "API Data Exposure",
+      "severity": "Critical",
+      "dpdpReference": "DPDP Act §8(5) — Access Control & Data Minimisation",
+      "description": "Controller returns full database row (`SELECT *` or raw ORM entity) directly in `res.json(user)`, exposing password_hash, pan_number, phone, and internal KYC metadata to the client.",
+      "detectionLogic": "AST Response Serialization Check: Detects `res.json()` or `res.send()` calls passing unfiltered database result rows derived from `SELECT *` or unprojected entity queries.",
+      "affectedSinkType": "HTTP JSON Response",
+      "remediationSummary": "Project only required non-sensitive columns in SQL queries and apply a strict response DTO schema (e.g., UserPublicProfileSchema) before serialization."
+    },
+    {
+      "id": "PL-DPDP-010",
+      "name": "PII Written to Unredacted Error / Crash Telemetry",
+      "category": "Error Handling & Telemetry",
+      "severity": "Medium",
+      "dpdpReference": "DPDP Act §8(5) — Safeguards Against Accidental Disclosure",
+      "description": "Exception catch blocks attach full `req.body` or user objects to error tracking payloads (Sentry.captureException / error response bodies) without scrubbing PII fields.",
+      "detectionLogic": "AST CatchClause Inspection: Identifies error reporter calls or HTTP 500 responses inside catch blocks that serialize raw request bodies or stack traces.",
+      "affectedSinkType": "Crash Telemetry / HTTP 500",
+      "remediationSummary": "Scrub request bodies with a deterministic PII sanitizer before forwarding context to crash telemetry, and return generic error messages to clients."
+    },
+    {
+      "id": "PL-DPDP-011",
+      "name": "Unscoped Bulk Data Export Endpoint Without Tenant/Owner Guard",
+      "category": "Access Control & Exfiltration Risk",
+      "severity": "Critical",
+      "dpdpReference": "DPDP Act §8(4) & §8(5) — Technical & Organisational Safeguards",
+      "description": "Data export or CSV download route executes an unscoped query across customer records without enforcing tenant isolation, RBAC role checks, or rate limiting.",
+      "detectionLogic": "AST Route & SQL Query Analysis: Detects export/download routes executing SQL queries lacking `WHERE user_id = $1` or organization scope predicates and SQL string concatenation.",
+      "affectedSinkType": "Bulk Export HTTP Endpoint",
+      "remediationSummary": "Enforce strict RBAC authorization, parameterize the SQL query scoped to the authenticated principal (`WHERE user_id = $1`), and attach rate limiting."
+    },
+    {
+      "id": "PL-DPDP-012",
+      "name": "Unmapped Privacy Control Evidence in Processing Registry",
+      "category": "Governance & Auditability",
+      "severity": "Low",
+      "dpdpReference": "DPDP Act §8(1) & §10 — Data Fiduciary Accountability",
+      "description": "A route handling personal data lacks a machine-readable `@privacyPurpose` annotation or rule mapping entry linking the code path to the organization's Record of Processing Activities (RoPA).",
+      "detectionLogic": "Metadata & JSDoc AST Check: Checks PII-processing controllers for structured `@privacyPurpose` and `@retentionPolicy` governance annotations.",
+      "affectedSinkType": "Compliance Audit Registry",
+      "remediationSummary": "Annotate PII-handling controllers with `@privacyPurpose` and register the endpoint in the versioned privacy manifest."
+    }
+  ]
+}

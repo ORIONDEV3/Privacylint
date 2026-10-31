@@ -1,0 +1,44 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #070B14;
+    color: #F1F5F9;
+    letter-spacing: 0.005em;
+  }
+
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle custom scrollbars for code viewers and tables */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #070B14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
