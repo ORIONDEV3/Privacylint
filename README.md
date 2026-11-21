@@ -42,7 +42,7 @@ PrivacyLint is a deterministic privacy and security code analysis platform desig
         ├── FindingsView.tsx              # Vulnerability management, search/sort/filter, evidence inspector
         ├── PrivacyFlowGraphView.tsx      # Interactive 4-column PII lineage DAG visualization
         ├── AiFixGeneratorView.tsx        # Bounded code patch generator, diff viewer & sandbox re-scanner
-        └── SecurityAndGovernanceView.tsx # Security Center (10 controls), Reports export & Settings
+        └── SecurityAndGovernanceView.tsx # Security Center (10 controls) and report export
 ```
 
 ---

@@ -13,8 +13,6 @@ import {
   Menu,
   Network,
   Play,
-  ScanSearch,
-  Settings,
   Shield,
   ShieldAlert,
   Wrench,
@@ -30,7 +28,6 @@ import { AiFixGeneratorView } from './components/AiFixGeneratorView';
 import {
   ReportsView,
   SecurityCenterView,
-  SettingsView,
 } from './components/SecurityAndGovernanceView';
 import {
   AuditLogEntry,
@@ -56,13 +53,11 @@ import { SECURITY_CONTROLS_CATALOG } from './engine/securityControls';
 type WorkspaceTab =
   | 'dashboard'
   | 'repositories'
-  | 'scanner'
   | 'findings'
   | 'flow'
   | 'autofix'
   | 'security'
-  | 'reports'
-  | 'settings';
+  | 'reports';
 
 export default function App() {
   const isAutostart =
@@ -95,7 +90,6 @@ export default function App() {
       'security:audit',
     ],
   });
-  const [availableUsers, setAvailableUsers] = useState<UserProfile[]>([currentUser]);
   const [rules, setRules] = useState<RuleDefinition[]>(RULES);
   const [repositories, setRepositories] =
     useState<RepositoryProject[]>(INITIAL_REPOSITORIES);
@@ -126,8 +120,6 @@ export default function App() {
     SECURITY_CONTROLS_CATALOG
   );
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
-  const [aiConfigured, setAiConfigured] = useState<boolean>(false);
-
   const [selectedRepoId, setSelectedRepoId] = useState<string>(
     INITIAL_REPOSITORIES[0].id
   );
@@ -141,7 +133,6 @@ export default function App() {
       if (!res.ok) return;
       const data = await res.json();
       setCurrentUser(data.currentUser);
-      setAvailableUsers(data.availableUsers);
       setRules(data.rules);
       setRepositories(data.repositories);
       setScans(data.scans);
@@ -149,7 +140,6 @@ export default function App() {
       setGraphsByRepo(data.graphsByRepo);
       setSecurityControls(data.securityControls);
       setAuditLogs(data.auditLogs);
-      setAiConfigured(Boolean(data.aiConfigured));
       if (!selectedFinding && data.findings?.length > 0) {
         setSelectedFinding(data.findings[0]);
       }
@@ -182,14 +172,6 @@ export default function App() {
     } finally {
       setIsScanning(false);
     }
-  };
-
-  const handleResetSandbox = async () => {
-    await fetch(`/api/repositories/${selectedRepoId}/reset`, {
-      method: 'POST',
-    });
-    await fetchServerState();
-    setScanToast('Reset sample repository files back to baseline flawed state.');
   };
 
   const handleAddRepository = async (payload: {
@@ -333,7 +315,6 @@ export default function App() {
       icon: FolderGit2,
       count: repositories.length,
     },
-    { id: 'scanner', label: 'Code Scanner', icon: ScanSearch },
     {
       id: 'findings',
       label: 'Findings',
@@ -344,19 +325,16 @@ export default function App() {
     { id: 'autofix', label: 'AI Fix Generator', icon: Wrench },
     { id: 'security', label: 'Security Center', icon: Lock, count: 10 },
     { id: 'reports', label: 'Reports', icon: FileText },
-    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   const tabTitles: Record<WorkspaceTab, string> = {
     dashboard: 'Main Security & Privacy Dashboard',
     repositories: 'Repository Management',
-    scanner: 'Deterministic Code Scanner',
     findings: 'Findings & Vulnerability Triage',
     flow: 'Interactive Privacy Flow Graph',
     autofix: 'AI Fix Generator & Diff Review',
     security: 'Application Security Center',
     reports: 'Compliance & Triage Reports',
-    settings: 'Organization & RBAC Settings',
   };
 
   return (
@@ -589,16 +567,14 @@ export default function App() {
               selectedRepoId={selectedRepoId}
               onSelectRepo={setSelectedRepoId}
               onStartScan={(id) => handleStartScan(id)}
-              onResetSandbox={handleResetSandbox}
               onSelectFinding={handleSelectFindingAndNavigate}
               onNavigateTab={(t) => setActiveTab(t as WorkspaceTab)}
               isScanning={isScanning}
             />
           )}
 
-          {(activeTab === 'repositories' || activeTab === 'scanner') && (
+          {activeTab === 'repositories' && (
             <RepositoriesView
-              mode={activeTab}
               repositories={repositories}
               rules={rules}
               scans={scans}
@@ -663,14 +639,6 @@ export default function App() {
             />
           )}
 
-          {activeTab === 'settings' && (
-            <SettingsView
-              currentUser={currentUser}
-              availableUsers={availableUsers}
-              aiConfigured={aiConfigured}
-              onSwitchRole={handleSwitchRole}
-            />
-          )}
         </main>
       </div>
     </div>

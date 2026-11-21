@@ -18,7 +18,6 @@ import {
   FolderGit2,
   Network,
   Play,
-  RotateCcw,
   ScanSearch,
   ShieldAlert,
   Wrench,
@@ -32,7 +31,6 @@ interface DashboardViewProps {
   selectedRepoId: string;
   onSelectRepo: (repoId: string) => void;
   onStartScan: (repoId: string) => Promise<void>;
-  onResetSandbox: () => Promise<void>;
   onSelectFinding: (finding: Finding, targetTab?: 'findings' | 'flow' | 'autofix') => void;
   onNavigateTab: (tab: string) => void;
   isScanning: boolean;
@@ -45,7 +43,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   selectedRepoId,
   onSelectRepo,
   onStartScan,
-  onResetSandbox,
   onSelectFinding,
   onNavigateTab,
   isScanning,
@@ -175,17 +172,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </>
           )}
 
-          {resolvedCount > 0 && (
-            <button
-              type="button"
-              onClick={onResetSandbox}
-              className="px-3 py-2 text-xs font-medium text-slate-400 hover:text-white bg-[#070B14] border border-slate-800 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0"
-              title="Reset sandbox repository to unpatched state"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset Sandbox</span>
-            </button>
-          )}
         </div>
       </div>
 
@@ -520,10 +506,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <h3 className="text-sm font-semibold text-white">Recent Scan Activity</h3>
               <button
                 type="button"
-                onClick={() => onNavigateTab('scanner')}
+                onClick={() => onNavigateTab('repositories')}
                 className="text-xs font-medium text-blue-400 hover:text-blue-300"
               >
-                Open Scanner
+                Open Repository Scanner
               </button>
             </div>
 
