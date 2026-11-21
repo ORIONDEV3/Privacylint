@@ -477,27 +477,6 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <div className="flex items-center gap-2 rounded-full border border-slate-800 bg-[#0C1222] p-1 pr-2.5">
-              <span
-                aria-hidden="true"
-                className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-blue-600 text-[11px] font-bold text-white shadow-md shadow-violet-950/30"
-              >
-                {currentUser.fullName
-                  .split(/\s+/)
-                  .map((part) => part[0])
-                  .join('')
-                  .slice(0, 2)
-                  .toUpperCase()}
-              </span>
-              <span className="hidden xl:block">
-                <span className="block max-w-28 truncate text-[11px] font-semibold leading-4 text-white">
-                  {currentUser.fullName}
-                </span>
-                <span className="block text-[10px] leading-3 text-violet-300">
-                  {currentUser.roleLabel}
-                </span>
-              </span>
-            </div>
             <label htmlFor="top-role-switcher" className="sr-only">
               Active Role
             </label>
@@ -505,7 +484,7 @@ export default function App() {
               id="top-role-switcher"
               value={currentUser.role}
               onChange={(e) => handleSwitchRole(e.target.value as RoleId)}
-              className="hidden sm:block max-w-36 px-3 py-2 text-xs bg-[#0C1222] border border-slate-800 rounded-full text-slate-300 font-mono"
+              className="hidden sm:block px-2.5 py-1.5 text-xs bg-[#0C1222] border border-slate-800 rounded-lg text-slate-300 font-mono"
               title="Switch RBAC role to test backend authorization"
             >
               <option value="ADMIN">Role: Admin</option>
@@ -523,14 +502,7 @@ export default function App() {
               <span>
                 {isScanning
                   ? 'Scanning...'
-                  : (
-                    <>
-                      <span className="sm:hidden">Scan</span>
-                      <span className="hidden sm:inline">
-                        Scan {activeRepository?.name} ({openCriticalTotal} Crit)
-                      </span>
-                    </>
-                  )}
+                  : `Scan ${activeRepository?.name} (${openCriticalTotal} Crit)`}
               </span>
             </button>
           </div>
