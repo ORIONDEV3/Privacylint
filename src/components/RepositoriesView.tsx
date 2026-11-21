@@ -22,6 +22,7 @@ import {
 } from '../engine/types';
 
 interface RepositoriesViewProps {
+  mode: 'repositories' | 'scanner';
   repositories: RepositoryProject[];
   rules: RuleDefinition[];
   scans: ScanRecord[];
@@ -41,6 +42,7 @@ interface RepositoriesViewProps {
 }
 
 export const RepositoriesView: React.FC<RepositoriesViewProps> = ({
+  mode,
   repositories,
   rules,
   scans,
@@ -183,10 +185,14 @@ export const RepositoriesView: React.FC<RepositoriesViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0C1222] border border-slate-800 rounded-xl p-5">
         <div>
           <div className="text-xs font-mono text-blue-400 mb-1">
-            Repository intake & deterministic scanning
+            {mode === 'scanner'
+              ? 'Deterministic AST & SQL DDL Code Scanner'
+              : 'Repository & Source Code Sandbox Management'}
           </div>
           <h2 className="text-lg font-bold text-white">
-            Connect a repository, inspect evidence, and run a scan
+            {mode === 'scanner'
+              ? `Active Target: ${selectedRepo?.name} (${selectedRepo?.branch})`
+              : 'Connected Repositories & Preloaded Sample Sandbox'}
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
             Authorized read-only code analysis. Private repository credentials are never requested or exposed.
@@ -284,7 +290,7 @@ export const RepositoriesView: React.FC<RepositoriesViewProps> = ({
         })}
       </div>
 
-      {/* Rule Configuration & Scan Execution Status */}
+      {/* Scanner Rule Configuration & Execution Status (Highlighted when in Scanner Mode) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Source File Tree & Code Viewer */}
         <div className="lg:col-span-8 bg-[#0C1222] border border-slate-800 rounded-xl overflow-hidden flex flex-col">

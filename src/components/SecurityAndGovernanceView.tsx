@@ -9,14 +9,17 @@ import {
   Shield,
   ShieldAlert,
   ShieldCheck,
+  Users,
 } from 'lucide-react';
 import {
   AuditLogEntry,
   Finding,
   PrivacyFlowGraphData,
   RepositoryProject,
+  RoleId,
   ScanRecord,
   SecurityControlItem,
+  UserProfile,
 } from '../engine/types';
 
 interface SecurityCenterProps {
@@ -595,6 +598,241 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================================
+// SETTINGS VIEW
+// ============================================================================
+interface SettingsViewProps {
+  currentUser: UserProfile;
+  availableUsers: UserProfile[];
+  aiConfigured: boolean;
+  onSwitchRole: (role: RoleId) => Promise<void>;
+}
+
+export const SettingsView: React.FC<SettingsViewProps> = ({
+  currentUser,
+  availableUsers,
+  aiConfigured,
+  onSwitchRole,
+}) => {
+  const [orgName, setOrgName] = useState(currentUser.organizationName);
+  const [dpoEmail, setDpoEmail] = useState('dpo-office@bharatpay.in');
+  const [retentionDays, setRetentionDays] = useState('365');
+  const [notifyCritical, setNotifyCritical] = useState(true);
+  const [notifyCertIn, setNotifyCertIn] = useState(true);
+  const [savedBanner, setSavedBanner] = useState<string | null>(null);
+
+  const handleSaveSettings = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavedBanner(
+      'Organization governance, retention policy, and notification settings updated.'
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      {savedBanner && (
+        <div
+          role="status"
+          className="p-4 rounded-xl bg-emerald-950/50 border border-emerald-700/80 text-xs text-emerald-200 flex items-center gap-2"
+        >
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <span>{savedBanner}</span>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left: User Profile & Organization Settings */}
+        <form
+          onSubmit={handleSaveSettings}
+          className="lg:col-span-7 bg-[#0C1222] border border-slate-800 rounded-xl p-6 space-y-5"
+        >
+          <div className="pb-4 border-b border-slate-800">
+            <h2 className="text-base font-bold text-white">
+              User Profile &amp; Organization Governance
+            </h2>
+            <p className="text-xs text-slate-400">
+              Manage Data Protection Officer (DPO) contact metadata and default retention horizons.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div>
+              <label
+                htmlFor="set-user-name"
+                className="block text-slate-400 mb-1"
+              >
+                Authenticated User
+              </label>
+              <input
+                id="set-user-name"
+                type="text"
+                readOnly
+                value={`${currentUser.fullName} (${currentUser.email})`}
+                className="w-full px-3 py-2 bg-[#070B14] border border-slate-800 rounded-lg text-slate-300"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="set-user-role"
+                className="block text-slate-400 mb-1"
+              >
+                Active RBAC Role (Switch to Test Permissions)
+              </label>
+              <select
+                id="set-user-role"
+                value={currentUser.role}
+                onChange={(e) => onSwitchRole(e.target.value as RoleId)}
+                className="w-full px-3 py-2 bg-[#070B14] border border-slate-700 rounded-lg text-white font-mono"
+              >
+                <option value="ADMIN">ADMIN (Organization Admin)</option>
+                <option value="SECURITY_ANALYST">
+                  SECURITY_ANALYST (Security Analyst)
+                </option>
+                <option value="DEVELOPER">DEVELOPER (Application Developer)</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="set-org-name" className="block text-slate-400 mb-1">
+                Organization Name
+              </label>
+              <input
+                id="set-org-name"
+                type="text"
+                value={orgName}
+                onChange={(e) => setOrgName(e.target.value)}
+                className="w-full px-3 py-2 bg-[#070B14] border border-slate-700 rounded-lg text-white"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="set-dpo-email" className="block text-slate-400 mb-1">
+                Data Protection Officer (DPO) Contact
+              </label>
+              <input
+                id="set-dpo-email"
+                type="email"
+                value={dpoEmail}
+                onChange={(e) => setDpoEmail(e.target.value)}
+                className="w-full px-3 py-2 bg-[#070B14] border border-slate-700 rounded-lg text-white"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="set-retention"
+                className="block text-slate-400 mb-1"
+              >
+                Default PII Retention Threshold (Days)
+              </label>
+              <input
+                id="set-retention"
+                type="number"
+                value={retentionDays}
+                onChange={(e) => setRetentionDays(e.target.value)}
+                className="w-full px-3 py-2 bg-[#070B14] border border-slate-700 rounded-lg text-white font-mono"
+              />
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-800 space-y-2.5 text-xs">
+            <div className="font-semibold text-white">Notification Preferences</div>
+            <label className="flex items-center gap-2.5 text-slate-300 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={notifyCritical}
+                onChange={(e) => setNotifyCritical(e.target.checked)}
+              />
+              <span>
+                Alert Security Analyst team immediately when Critical PII leakage rules trigger
+              </span>
+            </label>
+            <label className="flex items-center gap-2.5 text-slate-300 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={notifyCertIn}
+                onChange={(e) => setNotifyCertIn(e.target.checked)}
+              />
+              <span>
+                Include CERT-In &amp; DPDP §8(6) breach-readiness checklist in weekly digests
+              </span>
+            </label>
+          </div>
+
+          <div className="pt-3 flex justify-end">
+            <button
+              type="submit"
+              className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors"
+            >
+              Save Organization Settings
+            </button>
+          </div>
+        </form>
+
+        {/* Right: Team Management, RBAC Permissions & Backend Integration Status */}
+        <div className="lg:col-span-5 space-y-6">
+          <div className="bg-[#0C1222] border border-slate-800 rounded-xl p-5">
+            <h3 className="text-sm font-bold text-white mb-3">
+              Team Directory &amp; RBAC Matrix
+            </h3>
+            <div className="space-y-2.5 text-xs">
+              {availableUsers.map((u) => (
+                <div
+                  key={u.id}
+                  className="p-3 rounded-lg bg-[#070B14] border border-slate-800 flex items-center justify-between"
+                >
+                  <div>
+                    <div className="font-semibold text-white">{u.fullName}</div>
+                    <div className="text-[11px] font-mono text-slate-400">
+                      {u.email}
+                    </div>
+                  </div>
+                  <div className="text-right font-mono">
+                    <div className="text-blue-400">{u.role}</div>
+                    <div className="text-[10px] text-slate-500">
+                      {u.permissions.length} scopes
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-[#0C1222] border border-slate-800 rounded-xl p-5 space-y-3 text-xs">
+            <h3 className="text-sm font-bold text-white">
+              Integrations &amp; Server Proxy Status
+            </h3>
+            <div className="p-3 rounded-lg bg-[#070B14] border border-slate-800 flex items-center justify-between">
+              <div>
+                <div className="font-semibold text-white">
+                  Server-Side Gemini Remediation Proxy
+                </div>
+                <div className="text-[11px] text-slate-400">
+                  Managed via server environment variables (never exposed to client)
+                </div>
+              </div>
+              <span className="font-mono text-emerald-400">
+                {aiConfigured ? 'Connected' : 'Template Fallback'}
+              </span>
+            </div>
+
+            <div className="p-3 rounded-lg bg-[#070B14] border border-slate-800 flex items-center justify-between">
+              <div>
+                <div className="font-semibold text-white">GitHub App Integration</div>
+                <div className="text-[11px] text-slate-400">
+                  Read-only tree scanner &amp; PR branch generator
+                </div>
+              </div>
+              <span className="font-mono text-emerald-400">Authorized</span>
+            </div>
           </div>
         </div>
       </div>

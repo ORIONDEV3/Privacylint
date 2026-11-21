@@ -30,12 +30,20 @@ const PORT = 3000;
 const SESSION_SECRET =
   process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
 
+// Initialize server-side Gemini client with required User-Agent header
 function getGeminiClient(): GoogleGenAI | null {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey === 'MY_GEMINI_API_KEY' || apiKey.trim() === '') {
     return null;
   }
-  return new GoogleGenAI({ apiKey });
+  return new GoogleGenAI({
+    apiKey,
+    httpOptions: {
+      headers: {
+        'User-Agent': 'aistudio-build',
+      },
+    },
+  });
 }
 
 // ============================================================================
@@ -219,7 +227,7 @@ const usersStore: StoredUser[] = [
 
 let currentActiveUser: UserProfile = usersStore[0];
 
-// Clone initial repository fixtures for the in-memory workspace.
+// Clone initial repositories so sandbox edits can be reset cleanly
 let repositoriesStore: RepositoryProject[] = JSON.parse(
   JSON.stringify(INITIAL_REPOSITORIES)
 );
@@ -439,6 +447,7 @@ async function startServer() {
 
     res.json({
       currentUser: currentActiveUser,
+      availableUsers: usersStore.map(({ passwordHash: _ph, ...u }) => u),
       rules: RULES,
       repositories: repositoriesStore,
       scans: scansStore,
@@ -446,6 +455,7 @@ async function startServer() {
       graphsByRepo,
       securityControls: SECURITY_CONTROLS_CATALOG,
       auditLogs: auditLogsStore,
+      aiConfigured: Boolean(getGeminiClient()),
     });
   });
 
@@ -595,6 +605,18 @@ async function startServer() {
       });
     }
   );
+
+  // POST /api/repositories/:id/reset — Reset sample repository back to unpatched state
+  app.post('/api/repositories/:id/reset', (req: Request, res: Response) => {
+    initializeSeedData();
+    recordAuditLog(
+      currentActiveUser,
+      'SANDBOX_RESET',
+      'Reset sample repositories to baseline flawed state',
+      req.ip || '127.0.0.1'
+    );
+    return res.json({ status: 'reset_complete' });
+  });
 
   // POST /api/scans/run — Run deterministic AST/Rule scan on a repository
   app.post('/api/scans/run', (req: Request, res: Response) => {
