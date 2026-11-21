@@ -26,10 +26,9 @@ import {
 
 dotenv.config();
 
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = 3000;
 const SESSION_SECRET =
   process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
-const SECURE_COOKIE_FLAG = process.env.NODE_ENV === 'production' ? '; Secure' : '';
 
 function getGeminiClient(): GoogleGenAI | null {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -468,7 +467,7 @@ async function startServer() {
     const token = signSessionToken(safeUser.id, safeUser.role);
     res.setHeader(
       'Set-Cookie',
-      `pl_session=${token}; HttpOnly; Path=/; Max-Age=28800; SameSite=Lax${SECURE_COOKIE_FLAG}`
+      `pl_session=${token}; HttpOnly; Path=/; Max-Age=28800; SameSite=Lax`
     );
     recordAuditLog(safeUser, 'AUTH_LOGIN', safeUser.email, req.ip || '127.0.0.1');
     return res.json({ user: safeUser });
@@ -506,7 +505,7 @@ async function startServer() {
     const token = signSessionToken(safeUser.id, safeUser.role);
     res.setHeader(
       'Set-Cookie',
-      `pl_session=${token}; HttpOnly; Path=/; Max-Age=28800; SameSite=Lax${SECURE_COOKIE_FLAG}`
+      `pl_session=${token}; HttpOnly; Path=/; Max-Age=28800; SameSite=Lax`
     );
     recordAuditLog(safeUser, 'AUTH_REGISTER', safeUser.email, req.ip || '127.0.0.1');
     return res.status(201).json({ user: safeUser });
