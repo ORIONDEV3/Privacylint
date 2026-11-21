@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { ArrowLeft, CheckCircle2, Lock, Mail, Shield, User } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  BadgeCheck,
+  Building2,
+  CheckCircle2,
+  KeyRound,
+  LockKeyhole,
+  Mail,
+  ShieldCheck,
+  UserRound,
+} from 'lucide-react';
 import { RoleId, UserProfile } from '../engine/types';
 
 interface AuthViewProps {
@@ -14,20 +25,19 @@ export const AuthView: React.FC<AuthViewProps> = ({
   onBackToLanding,
 }) => {
   const [mode, setMode] = useState<'login' | 'register' | 'forgot'>(initialMode);
-  const [email, setEmail] = useState('ananya.sharma@bharatpay.in');
-  const [password, setPassword] = useState('PrivacyLint#2026');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [organizationName, setOrganizationName] = useState('BharatPay FinTech Pvt Ltd');
+  const [organizationName, setOrganizationName] = useState('');
   const [role, setRole] = useState<RoleId>('SECURITY_ANALYST');
   const [error, setError] = useState<string | null>(null);
   const [resetMessage, setResetMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleQuickPersona = (personaEmail: string) => {
-    setMode('login');
-    setEmail(personaEmail);
-    setPassword('PrivacyLint#2026');
+  const changeMode = (nextMode: 'login' | 'register' | 'forgot') => {
+    setMode(nextMode);
     setError(null);
+    setResetMessage(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,7 +51,7 @@ export const AuthView: React.FC<AuthViewProps> = ({
         return;
       }
       setResetMessage(
-        `Password reset instructions and a time-bound recovery token have been queued for ${email}.`
+        'Password recovery is not configured in this prototype. Contact your workspace administrator to reset access.'
       );
       return;
     }
@@ -72,272 +82,168 @@ export const AuthView: React.FC<AuthViewProps> = ({
     }
   };
 
+  const isLogin = mode === 'login';
+  const isRegister = mode === 'register';
+
   return (
-    <div className="min-h-screen bg-[#070B14] text-slate-100 flex flex-col justify-between p-6">
-      <div>
-        <button
-          type="button"
-          onClick={onBackToLanding}
-          className="inline-flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-white transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to PrivacyLint Overview</span>
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-[#f7f8fc] px-4 py-5 text-slate-950 sm:px-8 sm:py-7">
+      <div aria-hidden="true" className="pointer-events-none absolute -right-32 -top-40 h-[32rem] w-[32rem] rounded-full bg-violet-200/50 blur-3xl" />
+      <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between gap-4">
+        <a href="#top" onClick={(event) => { event.preventDefault(); onBackToLanding(); }} className="flex items-center gap-2.5">
+          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-violet-700 text-white shadow-md shadow-violet-200"><ShieldCheck className="h-5 w-5" /></span>
+          <span className="text-lg font-extrabold tracking-tight">Privacy<span className="text-violet-700">Lint</span></span>
+        </a>
+        <button type="button" onClick={onBackToLanding} className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-white hover:text-violet-800">
+          <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">Back to overview</span><span className="sm:hidden">Back</span>
         </button>
-      </div>
+      </header>
 
-      <div className="max-w-md w-full mx-auto bg-[#0C1222] border border-slate-800 rounded-xl p-8 my-8">
-        <div className="flex items-center gap-2.5 mb-6">
-          <Shield className="w-6 h-6 text-blue-500" />
-          <span className="text-lg font-bold tracking-tight text-white">PrivacyLint</span>
-        </div>
-
-        <h1 className="text-xl font-bold text-white mb-1">
-          {mode === 'login'
-            ? 'Sign In to Workspace'
-            : mode === 'register'
-            ? 'Create Organization Account'
-            : 'Reset Account Password'}
-        </h1>
-        <p className="text-xs text-slate-400 mb-6">
-          {mode === 'login'
-            ? 'Protected by scrypt cryptographic password hashing and HttpOnly signed session cookies.'
-            : mode === 'register'
-            ? 'Configure role-based access control for your engineering and security team.'
-            : 'Enter your registered email to receive a recovery token.'}
-        </p>
-
-        {/* Mode Switcher Tabs */}
-        <div className="grid grid-cols-3 gap-1 p-1 bg-[#070B14] border border-slate-800 rounded-lg mb-6">
-          <button
-            type="button"
-            onClick={() => {
-              setMode('login');
-              setError(null);
-              setResetMessage(null);
-            }}
-            className={`py-1.5 text-xs font-medium rounded-md transition-colors ${
-              mode === 'login'
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Sign In
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMode('register');
-              setError(null);
-              setResetMessage(null);
-            }}
-            className={`py-1.5 text-xs font-medium rounded-md transition-colors ${
-              mode === 'register'
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Register
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMode('forgot');
-              setError(null);
-              setResetMessage(null);
-            }}
-            className={`py-1.5 text-xs font-medium rounded-md transition-colors ${
-              mode === 'forgot'
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Reset Password
-          </button>
-        </div>
-
-        {error && (
-          <div
-            role="alert"
-            className="mb-4 p-3 rounded-lg bg-rose-950/50 border border-rose-800/80 text-xs text-rose-200"
-          >
-            {error}
+      <main className="relative z-10 mx-auto grid w-full max-w-6xl flex-1 items-center gap-8 py-10 lg:grid-cols-2 lg:gap-14 lg:py-14">
+        <section className="mx-auto max-w-xl lg:mx-0">
+          <div className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-white/80 px-3.5 py-2 text-xs font-bold uppercase tracking-[0.12em] text-violet-800 shadow-sm">
+            <LockKeyhole className="h-3.5 w-3.5" /> Secure workspace access
           </div>
-        )}
+          <h1 className="mt-6 text-4xl font-extrabold leading-tight tracking-[-0.04em] text-slate-950 sm:text-5xl">
+            Keep privacy reviews moving.
+          </h1>
+          <p className="mt-5 max-w-lg text-base leading-7 text-slate-600">
+            Sign in to inspect repository findings, follow personal data flows, and review verified fixes with your team.
+          </p>
 
-        {resetMessage && (
-          <div
-            role="status"
-            className="mb-4 p-3 rounded-lg bg-emerald-950/50 border border-emerald-800/80 text-xs text-emerald-200 flex items-start gap-2"
-          >
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-            <span>{resetMessage}</span>
+          <div className="mt-8 space-y-3">
+            {[
+              'Evidence linked to the exact source file and line',
+              'Separate access for Admins, Analysts and Developers',
+              'Findings close only after a fresh scan passes',
+            ].map((item) => (
+              <div key={item} className="flex items-start gap-3 rounded-2xl border border-slate-200/80 bg-white/75 p-4">
+                <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-emerald-100 text-emerald-700"><CheckCircle2 className="h-4 w-4" /></span>
+                <span className="text-sm font-medium leading-6 text-slate-700">{item}</span>
+              </div>
+            ))}
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === 'register' && (
-            <>
-              <div>
-                <label
-                  htmlFor="auth-fullname"
-                  className="block text-xs font-medium text-slate-300 mb-1.5"
+          <div className="mt-8 flex items-center gap-3 text-sm text-slate-500">
+            <span className="grid h-10 w-10 place-items-center rounded-full border border-violet-200 bg-white text-violet-700"><BadgeCheck className="h-5 w-5" /></span>
+            <span><strong className="font-bold text-slate-800">PrivacyLint</strong><br />Role-based access · DPDP-aware triage</span>
+          </div>
+        </section>
+
+        <section className="mx-auto w-full max-w-lg">
+          <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-[0_24px_70px_-34px_rgba(40,30,80,0.35)] sm:p-8">
+            <div className="mb-6">
+              <div className="text-xs font-extrabold uppercase tracking-[0.16em] text-violet-700">
+                {isLogin ? 'Welcome back' : isRegister ? 'Create your workspace' : 'Account recovery'}
+              </div>
+              <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-950">
+                {isLogin ? 'Sign in to PrivacyLint' : isRegister ? 'Set up your account' : 'Reset your password'}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                {isLogin
+                  ? 'Enter your work email and password to continue.'
+                  : isRegister
+                    ? 'Create an organization account and choose your workspace role.'
+                    : 'Enter your work email to request account recovery.'}
+              </p>
+            </div>
+
+            <div className="mb-6 grid grid-cols-3 gap-1 rounded-full bg-slate-100 p-1" role="tablist" aria-label="Account actions">
+              {[
+                { id: 'login' as const, label: 'Sign in' },
+                { id: 'register' as const, label: 'Register' },
+                { id: 'forgot' as const, label: 'Reset' },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === item.id}
+                  onClick={() => changeMode(item.id)}
+                  className={`rounded-full px-2 py-2.5 text-xs font-bold transition sm:text-sm ${mode === item.id ? 'bg-white text-violet-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
                 >
-                  Full Name
-                </label>
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            {error && <div role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{error}</div>}
+            {resetMessage && (
+              <div role="status" className="mb-4 flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> <span>{resetMessage}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {isRegister && (
+                <>
+                  <div>
+                    <label htmlFor="auth-fullname" className="mb-1.5 block text-sm font-semibold text-slate-700">Full name</label>
+                    <div className="relative">
+                      <UserRound className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+                      <input id="auth-fullname" type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="auth-org" className="mb-1.5 block text-sm font-semibold text-slate-700">Organization</label>
+                    <div className="relative">
+                      <Building2 className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+                      <input id="auth-org" type="text" required value={organizationName} onChange={(e) => setOrganizationName(e.target.value)} placeholder="Company or team name" className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="auth-role" className="mb-1.5 block text-sm font-semibold text-slate-700">Workspace role</label>
+                    <select id="auth-role" value={role} onChange={(e) => setRole(e.target.value as RoleId)} className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-sm text-slate-800 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100">
+                      <option value="ADMIN">Admin</option>
+                      <option value="SECURITY_ANALYST">Security Analyst</option>
+                      <option value="DEVELOPER">Developer</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              <div>
+                <label htmlFor="auth-email" className="mb-1.5 block text-sm font-semibold text-slate-700">Work email</label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
-                  <input
-                    id="auth-fullname"
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Vikramaditya Rao"
-                    className="w-full pl-9 pr-3 py-2 text-sm bg-[#070B14] border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                  />
+                  <Mail className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+                  <input id="auth-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" autoComplete="email" className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100" />
                 </div>
               </div>
 
-              <div>
-                <label
-                  htmlFor="auth-org"
-                  className="block text-xs font-medium text-slate-300 mb-1.5"
-                >
-                  Organization Name
-                </label>
-                <input
-                  id="auth-org"
-                  type="text"
-                  required
-                  value={organizationName}
-                  onChange={(e) => setOrganizationName(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-[#070B14] border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                />
-              </div>
+              {mode !== 'forgot' && (
+                <div>
+                  <div className="mb-1.5 flex items-center justify-between gap-3">
+                    <label htmlFor="auth-password" className="text-sm font-semibold text-slate-700">Password</label>
+                    {isLogin && <button type="button" onClick={() => changeMode('forgot')} className="text-xs font-bold text-violet-700 hover:text-violet-900">Forgot password?</button>}
+                  </div>
+                  <div className="relative">
+                    <KeyRound className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+                    <input id="auth-password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={isRegister ? 'new-password' : 'current-password'} placeholder="Enter your password" className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-violet-500 focus:ring-4 focus:ring-violet-100" />
+                  </div>
+                </div>
+              )}
 
-              <div>
-                <label
-                  htmlFor="auth-role"
-                  className="block text-xs font-medium text-slate-300 mb-1.5"
-                >
-                  RBAC Role Assignment
-                </label>
-                <select
-                  id="auth-role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value as RoleId)}
-                  className="w-full px-3 py-2 text-sm bg-[#070B14] border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                >
-                  <option value="ADMIN">Admin (Organization &amp; User Management)</option>
-                  <option value="SECURITY_ANALYST">
-                    Security Analyst (Scan &amp; Findings Triage)
-                  </option>
-                  <option value="DEVELOPER">
-                    Developer (Repository &amp; Patch Review)
-                  </option>
-                </select>
-              </div>
-            </>
-          )}
+              <button type="submit" disabled={loading} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-violet-700 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-violet-200 transition hover:bg-violet-800 disabled:cursor-wait disabled:opacity-60">
+                {loading ? 'Please wait…' : isLogin ? 'Sign in to workspace' : isRegister ? 'Create account' : 'Send recovery instructions'}
+                {!loading && <ArrowRight className="h-4 w-4" />}
+              </button>
+            </form>
 
-          <div>
-            <label
-              htmlFor="auth-email"
-              className="block text-xs font-medium text-slate-300 mb-1.5"
-            >
-              Work Email
-            </label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
-              <input
-                id="auth-email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@company.in"
-                className="w-full pl-9 pr-3 py-2 text-sm bg-[#070B14] border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-              />
-            </div>
+            {isLogin && (
+              <p className="mt-6 text-center text-sm text-slate-500">
+                New to PrivacyLint?{' '}
+                <button type="button" onClick={() => changeMode('register')} className="font-bold text-violet-700 hover:text-violet-900">Create an account</button>
+              </p>
+            )}
           </div>
+          <p className="mt-4 text-center text-xs leading-5 text-slate-500">Passwords are protected with the server’s configured password hashing and session controls.</p>
+        </section>
+      </main>
 
-          {mode !== 'forgot' && (
-            <div>
-              <label
-                htmlFor="auth-password"
-                className="block text-xs font-medium text-slate-300 mb-1.5"
-              >
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
-                <input
-                  id="auth-password"
-                  type="password"
-                  required
-                  minLength={6}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm bg-[#070B14] border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                />
-              </div>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 px-4 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-lg transition-colors"
-          >
-            {loading
-              ? 'Verifying Credentials...'
-              : mode === 'login'
-              ? 'Sign In to Workspace'
-              : mode === 'register'
-              ? 'Create Account & Continue'
-              : 'Send Recovery Instructions'}
-          </button>
-        </form>
-
-        {/* Preloaded RBAC Test Accounts */}
-        {mode === 'login' && (
-          <div className="mt-6 pt-5 border-t border-slate-800">
-            <div className="text-xs text-slate-400 mb-2.5">
-              Quick Demo Personas (Password: <code className="text-slate-200">PrivacyLint#2026</code>):
-            </div>
-            <div className="space-y-1.5">
-              <button
-                type="button"
-                onClick={() => handleQuickPersona('ananya.sharma@bharatpay.in')}
-                className="w-full text-left px-3 py-2 rounded-lg bg-[#070B14] hover:bg-slate-900 border border-slate-800 text-xs flex items-center justify-between transition-colors"
-              >
-                <span className="font-medium text-slate-200">Ananya Sharma</span>
-                <span className="font-mono text-blue-400">Admin</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickPersona('rohan.verma@bharatpay.in')}
-                className="w-full text-left px-3 py-2 rounded-lg bg-[#070B14] hover:bg-slate-900 border border-slate-800 text-xs flex items-center justify-between transition-colors"
-              >
-                <span className="font-medium text-slate-200">Rohan Verma</span>
-                <span className="font-mono text-violet-400">Security Analyst</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickPersona('karthik.nair@bharatpay.in')}
-                className="w-full text-left px-3 py-2 rounded-lg bg-[#070B14] hover:bg-slate-900 border border-slate-800 text-xs flex items-center justify-between transition-colors"
-              >
-                <span className="font-medium text-slate-200">Karthik Nair</span>
-                <span className="font-mono text-emerald-400">Developer</span>
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="text-center text-xs text-slate-500">
-        PrivacyLint Enterprise Authentication · Argon2id / scrypt KDF · RBAC Enforced
-      </div>
+      <footer className="relative z-10 mx-auto w-full max-w-7xl border-t border-slate-200 pt-5 text-center text-xs text-slate-500">
+        PrivacyLint · Secure privacy engineering workspace
+      </footer>
     </div>
   );
 };

@@ -1,16 +1,27 @@
 import React from 'react';
 import {
+  Activity,
   ArrowRight,
-  CheckCircle2,
+  ArrowUpRight,
+  Bug,
+  ChartNoAxesCombined,
+  Check,
+  CircleCheck,
   Code2,
   Database,
-  FileCode2,
+  FileSearch,
   GitBranch,
-  Lock,
+  KeyRound,
+  LockKeyhole,
   Network,
+  ScanLine,
   Shield,
-  ShieldAlert,
-  Terminal,
+  ShieldCheck,
+  Sparkles,
+  Upload,
+  UserRound,
+  Wrench,
+  type LucideIcon,
 } from 'lucide-react';
 import { RuleDefinition } from '../engine/types';
 
@@ -21,6 +32,97 @@ interface LandingPageProps {
   onOpenAuth: (mode: 'login' | 'register') => void;
 }
 
+const capabilities: {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  tone: string;
+}[] = [
+  {
+    icon: ScanLine,
+    title: 'Detection engine',
+    description:
+      '12 deterministic DPDP rules inspect Node.js, Express and PostgreSQL. AI never decides whether a finding exists.',
+    tone: 'violet',
+  },
+  {
+    icon: Activity,
+    title: 'Risk scoring',
+    description:
+      'A clear risk score is calculated from findings and recalculated after each verified fix.',
+    tone: 'blue',
+  },
+  {
+    icon: Network,
+    title: 'Privacy Flow Graph',
+    description:
+      'Trace personal data from API route to controller, database field and logger or external sink.',
+    tone: 'cyan',
+  },
+  {
+    icon: GitBranch,
+    title: 'Repository intake',
+    description:
+      'Connect a GitHub repository or upload a ZIP. Review source in the built-in viewer and start the first scan.',
+    tone: 'blue',
+  },
+  {
+    icon: FileSearch,
+    title: 'Findings management',
+    description:
+      'Search, sort and filter findings, inspect source evidence, then triage with Admin or Security Analyst access.',
+    tone: 'amber',
+  },
+  {
+    icon: Wrench,
+    title: 'AI fix generator',
+    description:
+      'Review bounded Gemini patch suggestions in a diff viewer, with deterministic offline templates as fallback.',
+    tone: 'violet',
+  },
+  {
+    icon: CircleCheck,
+    title: 'Verified resolution',
+    description:
+      'A finding is resolved only after its patch is applied in a sandbox and a fresh scan passes.',
+    tone: 'green',
+  },
+  {
+    icon: ChartNoAxesCombined,
+    title: 'Security dashboard',
+    description:
+      'See KPIs, scan history, severity charts and live filters together in one workspace.',
+    tone: 'blue',
+  },
+  {
+    icon: UserRound,
+    title: 'Authentication & access',
+    description:
+      'Use login and registration with role-based access for Admins, Security Analysts and Developers.',
+    tone: 'violet',
+  },
+  {
+    icon: LockKeyhole,
+    title: 'Security & governance',
+    description:
+      'Track 10 security controls, live runtime checks, audit logs and report exports.',
+    tone: 'green',
+  },
+  {
+    icon: Bug,
+    title: 'Scanner tests',
+    description:
+      'Unit tests cover the deterministic scanner engine so rule behavior stays reviewable.',
+    tone: 'amber',
+  },
+];
+
+const flowSteps = [
+  { icon: GitBranch, label: 'Connect a repository', detail: 'GitHub or ZIP upload' },
+  { icon: ScanLine, label: 'Run deterministic rules', detail: 'Evidence at file and line' },
+  { icon: Wrench, label: 'Review, patch, rescan', detail: 'Verify before resolution' },
+];
+
 export const LandingPage: React.FC<LandingPageProps> = ({
   rules,
   onGetStarted,
@@ -28,559 +130,284 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onOpenAuth,
 }) => {
   return (
-    <div className="min-h-screen bg-[#070B14] text-slate-100 flex flex-col">
-      {/* 3-Zone Top Bar Contract */}
-      <header className="sticky top-0 z-30 bg-[#070B14]/90 backdrop-blur-md border-b border-slate-800/80 px-6 lg:px-12 py-4 flex items-center justify-between gap-8">
-        <a
-          href="#top"
-          className="text-lg font-bold tracking-tight text-white whitespace-nowrap shrink-0 flex items-center gap-2.5"
-        >
-          <Shield className="w-5 h-5 text-blue-500" />
-          <span>PrivacyLint</span>
-        </a>
+    <div className="min-h-screen overflow-hidden bg-[#f7f8fc] text-slate-950">
+      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3.5 sm:px-8 lg:px-10">
+          <a href="#top" className="flex shrink-0 items-center gap-2.5" aria-label="PrivacyLint home">
+            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-violet-700 text-white shadow-lg shadow-violet-200">
+              <ShieldCheck className="h-5 w-5" />
+            </span>
+            <span className="text-lg font-extrabold tracking-tight text-slate-950">
+              Privacy<span className="text-violet-700">Lint</span>
+            </span>
+          </a>
 
-        <nav
-          aria-label="Primary Navigation"
-          className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300"
-        >
-          <a
-            href="#capabilities"
-            className="hover:text-white transition-colors whitespace-nowrap shrink-0"
-          >
-            Capabilities
-          </a>
-          <a
-            href="#how-it-works"
-            className="hover:text-white transition-colors whitespace-nowrap shrink-0"
-          >
-            How It Works
-          </a>
-          <a
-            href="#rule-engine"
-            className="hover:text-white transition-colors whitespace-nowrap shrink-0"
-          >
-            Rule Catalog
-          </a>
-          <a
-            href="#architecture"
-            className="hover:text-white transition-colors whitespace-nowrap shrink-0"
-          >
-            Architecture
-          </a>
-        </nav>
+          <nav aria-label="Primary navigation" className="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
+            <a href="#capabilities" className="transition hover:text-violet-700">Platform</a>
+            <a href="#how-it-works" className="transition hover:text-violet-700">How it works</a>
+            <a href="#trust" className="transition hover:text-violet-700">Security</a>
+          </nav>
 
-        <div className="flex items-center gap-3 shrink-0">
-          <button
-            type="button"
-            onClick={onViewDemo}
-            className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors whitespace-nowrap shrink-0"
-          >
-            View Live Demo
-          </button>
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={() => onOpenAuth('login')}
+              className="group inline-flex items-center gap-2 rounded-full px-2 py-1.5 text-sm font-semibold text-slate-700 transition hover:bg-violet-50 hover:text-violet-800 sm:pl-1.5 sm:pr-3"
+            >
+              <span className="grid h-9 w-9 place-items-center rounded-full border border-violet-200 bg-violet-50 text-violet-700 transition group-hover:bg-violet-100">
+                <UserRound className="h-4 w-4" />
+              </span>
+              <span className="hidden sm:inline">Admin login</span>
+              <span className="sm:hidden">Login</span>
+            </button>
+            <button
+              type="button"
+              onClick={onGetStarted}
+              className="rounded-full bg-violet-700 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-violet-200 transition hover:-translate-y-0.5 hover:bg-violet-800 sm:px-5"
+            >
+              Get started
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <main id="top" className="flex-1">
-        <section className="max-w-7xl mx-auto px-6 lg:px-12 pt-16 pb-20 lg:pt-24 lg:pb-24">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
-            <div className="lg:col-span-7 flex flex-col justify-center">
-              <div className="text-xs font-mono text-blue-400 mb-4 flex items-center gap-2">
-                <span>Find Privacy Risks Before They Become Breaches.</span>
-                <span aria-hidden="true">·</span>
-                <span>Code. Compliance. Confidence.</span>
+      <main id="top">
+        <section className="relative isolate">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[660px] bg-[radial-gradient(ellipse_at_76%_18%,rgba(196,181,253,0.55),transparent_36%),linear-gradient(180deg,#fff_0%,#f7f8fc_100%)]" />
+          <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 pb-16 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-12 lg:gap-10 lg:px-10 lg:pb-24 lg:pt-24">
+            <div className="lg:col-span-6">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-200 bg-white/80 px-3.5 py-2 text-xs font-bold uppercase tracking-[0.12em] text-violet-800 shadow-sm">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
+                Privacy risk, made visible
               </div>
 
-              <h1
-                className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight text-white leading-[1.1] mb-6"
-                style={{ textWrap: 'balance' }}
-              >
-                Make Your Code Privacy-Ready.
+              <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.08] tracking-[-0.045em] text-slate-950 sm:text-5xl lg:text-[3.65rem]">
+                Find the data leaks hiding in your code.
               </h1>
-
-              <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl mb-8">
-                PrivacyLint scans Node.js, TypeScript, and PostgreSQL repositories using
-                deterministic AST rules to detect personal data leaks, map end-to-end PII
-                flows across routes and sinks, align engineering triage with India&apos;s
-                DPDP Act 2023, and generate bounded, reviewable code patches.
+              <p className="mt-6 max-w-xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+                Scan your application, trace personal data across its journey, and verify every fix before it is marked resolved.
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 mb-10">
+              <div className="mt-8 flex flex-wrap items-center gap-3">
                 <button
                   type="button"
                   onClick={onViewDemo}
-                  className="px-6 py-3 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap shrink-0 shadow-sm"
+                  className="inline-flex items-center gap-2 rounded-full bg-violet-700 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-violet-200 transition hover:-translate-y-0.5 hover:bg-violet-800"
                 >
-                  <span>Launch Interactive Demo</span>
-                  <ArrowRight className="w-4 h-4" />
+                  Open live dashboard <ArrowRight className="h-4 w-4" />
                 </button>
-                <button
-                  type="button"
-                  onClick={onGetStarted}
-                  className="px-6 py-3 text-sm font-semibold text-slate-200 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg transition-colors whitespace-nowrap shrink-0"
+                <a
+                  href="#how-it-works"
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-violet-300 hover:text-violet-800"
                 >
-                  Get Started
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onOpenAuth('login')}
-                  className="px-4 py-3 text-sm font-medium text-slate-400 hover:text-white transition-colors whitespace-nowrap shrink-0"
-                >
-                  Sign In
-                </button>
+                  See how it works <ArrowUpRight className="h-4 w-4" />
+                </a>
               </div>
 
-              <div className="grid grid-cols-3 gap-6 pt-8 border-t border-slate-800/80">
-                <div>
-                  <div className="text-2xl font-bold text-white font-mono tabular-nums">
-                    12 MVP Rules
-                  </div>
-                  <div className="text-xs text-slate-400 mt-1">
-                    Deterministic AST &amp; SQL DDL checks
-                  </div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white font-mono tabular-nums">
-                    100% Evidence
-                  </div>
-                  <div className="text-xs text-slate-400 mt-1">
-                    Exact file, line &amp; sink traceability
-                  </div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white font-mono tabular-nums">
-                    DPDP 2023
-                  </div>
-                  <div className="text-xs text-slate-400 mt-1">
-                    Versioned engineering triage mappings
-                  </div>
-                </div>
+              <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-slate-200 pt-6 text-sm text-slate-600">
+                <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> {rules.length} deterministic rules</span>
+                <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> Evidence-first findings</span>
+                <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-600" /> DPDP Act mapping</span>
               </div>
             </div>
 
-            {/* Interactive Architecture Preview Card */}
-            <div className="lg:col-span-5 flex">
-              <div className="w-full bg-[#0C1222] border border-slate-800 rounded-xl p-6 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
+            <div className="relative lg:col-span-6 lg:pl-3">
+              <div aria-hidden="true" className="absolute -inset-7 -z-10 rounded-[3rem] bg-violet-200/50 blur-3xl" />
+              <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_28px_80px_-32px_rgba(50,35,90,0.35)]">
+                <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-6">
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-10 w-10 place-items-center rounded-2xl bg-violet-100 text-violet-700"><Shield className="h-5 w-5" /></span>
                     <div>
-                      <div className="text-xs font-mono text-slate-400">
-                        bharatpay-checkout-api · main
-                      </div>
-                      <div className="text-sm font-semibold text-white mt-0.5">
-                        Deterministic Detection Pipeline
-                      </div>
-                    </div>
-                    <span className="text-xs font-mono text-rose-400">
-                      4 Critical · 86/100 Risk
-                    </span>
-                  </div>
-
-                  {/* Sample Code Evidence */}
-                  <div className="bg-[#070B14] border border-slate-800/90 rounded-lg p-3.5 font-mono text-xs mb-4">
-                    <div className="text-slate-400 mb-2 flex items-center justify-between">
-                      <span>src/routes/checkout.ts:13</span>
-                      <span className="text-rose-400">PL-DPDP-002 (Critical)</span>
-                    </div>
-                    <div className="text-slate-500">
-                      11 | const &#123; email, phone, panNumber &#125; = req.body;
-                    </div>
-                    <div className="bg-rose-950/40 text-rose-200 px-1.5 py-0.5 rounded my-1">
-                      13 | console.log(&quot;Checkout PII:&quot;, &#123; email, phone, panNumber &#125;);
-                    </div>
-                    <div className="bg-emerald-950/40 text-emerald-300 px-1.5 py-0.5 rounded">
-                      +  | console.info(&quot;Checkout [REDACTED]&quot;, &#123; piiRedacted: true &#125;);
+                      <div className="text-sm font-bold text-slate-900">Privacy overview</div>
+                      <div className="mt-0.5 text-xs text-slate-500">Demo workspace · payments-api</div>
                     </div>
                   </div>
+                  <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">Scan complete</span>
+                </div>
 
-                  {/* Mini Data Flow Chain */}
-                  <div className="space-y-2.5 text-xs">
-                    <div className="text-slate-400 font-medium">
-                      Live Personal Data Lineage:
+                <div className="grid grid-cols-2 gap-3 p-4 sm:p-6">
+                  <div className="rounded-2xl bg-[#f7f5ff] p-4 sm:p-5">
+                    <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+                      Risk score <ChartNoAxesCombined className="h-4 w-4 text-violet-600" />
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="p-2.5 rounded-lg bg-[#070B14] border border-slate-800">
-                        <div className="text-slate-400">01. API Route</div>
-                        <div className="font-mono text-slate-200 mt-0.5 truncate">
-                          POST /api/v1/checkout
-                        </div>
+                    <div className="mt-3 flex items-end gap-2">
+                      <span className="text-4xl font-extrabold tracking-tight text-slate-950">68</span>
+                      <span className="pb-1 text-xs font-medium text-slate-500">/ 100</span>
+                    </div>
+                    <div className="mt-4 h-2 overflow-hidden rounded-full bg-violet-100">
+                      <div className="h-full w-[68%] rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500" />
+                    </div>
+                    <div className="mt-2 text-xs font-semibold text-violet-800">Needs attention</div>
+                  </div>
+                  <div className="rounded-2xl bg-slate-50 p-4 sm:p-5">
+                    <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+                      Open findings <FileSearch className="h-4 w-4 text-slate-500" />
+                    </div>
+                    <div className="mt-3 flex items-end gap-2">
+                      <span className="text-4xl font-extrabold tracking-tight text-slate-950">12</span>
+                      <span className="pb-1 text-xs font-medium text-slate-500">across 4 levels</span>
+                    </div>
+                    <div className="mt-4 flex h-2 overflow-hidden rounded-full bg-slate-200">
+                      <span className="w-1/4 bg-rose-500" /><span className="w-1/4 bg-orange-400" /><span className="w-1/4 bg-amber-300" /><span className="w-1/4 bg-slate-300" />
+                    </div>
+                    <div className="mt-2 text-xs font-semibold text-slate-600">4 critical · 5 high</div>
+                  </div>
+
+                  <div className="col-span-2 rounded-2xl border border-slate-200 p-4 sm:p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <div className="text-sm font-bold text-slate-900">Personal data flow</div>
+                        <div className="mt-1 text-xs text-slate-500">Trace the path. Find the risky sink.</div>
                       </div>
-                      <div className="p-2.5 rounded-lg bg-[#070B14] border border-slate-800">
-                        <div className="text-slate-400">02. Controller</div>
-                        <div className="font-mono text-slate-200 mt-0.5 truncate">
-                          checkout.ts:10
-                        </div>
-                      </div>
-                      <div className="p-2.5 rounded-lg bg-[#070B14] border border-slate-800">
-                        <div className="text-slate-400">03. Database Field</div>
-                        <div className="font-mono text-amber-300 mt-0.5 truncate">
-                          customer_checkouts.pan
-                        </div>
-                      </div>
-                      <div className="p-2.5 rounded-lg bg-[#070B14] border border-rose-900/60">
-                        <div className="text-rose-400">04. Unredacted Sink</div>
-                        <div className="font-mono text-rose-200 mt-0.5 truncate">
-                          stdout · analytics.track
-                        </div>
-                      </div>
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-2.5 py-1 text-[11px] font-bold text-violet-800"><Network className="h-3.5 w-3.5" /> Flow graph</span>
+                    </div>
+                    <div className="mt-5 grid grid-cols-7 items-center gap-0.5 sm:gap-2">
+                      {[
+                        { icon: Code2, label: 'API route', value: '/checkout', color: 'text-blue-700 bg-blue-50' },
+                        { icon: GitBranch, label: 'Controller', value: 'checkout.ts', color: 'text-violet-700 bg-violet-50' },
+                        { icon: Database, label: 'Database', value: 'customer.pan', color: 'text-amber-700 bg-amber-50' },
+                        { icon: LockKeyhole, label: 'Log sink', value: 'Unredacted', color: 'text-rose-700 bg-rose-50' },
+                      ].map((node, index) => {
+                        const Icon = node.icon;
+                        return (
+                          <React.Fragment key={node.label}>
+                            <div className="min-w-0">
+                              <div className={`mx-auto grid h-9 w-9 place-items-center rounded-xl ${node.color}`}><Icon className="h-4 w-4" /></div>
+                              <div className="mt-2 truncate text-center text-[10px] font-semibold text-slate-500 sm:text-xs">{node.label}</div>
+                              <div className="mt-0.5 truncate text-center text-[10px] font-bold text-slate-800 sm:text-[11px]">{node.value}</div>
+                            </div>
+                            {index < 3 && <span aria-hidden="true" className="-mt-7 text-center text-slate-300">→</span>}
+                          </React.Fragment>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                  <span>Zero AI Hallucinations · Evidence-First</span>
-                  <button
-                    type="button"
-                    onClick={onViewDemo}
-                    className="text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1"
-                  >
-                    <span>Inspect Full Scan</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                <div className="flex items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/80 px-5 py-3.5 text-xs sm:px-6">
+                  <span className="inline-flex items-center gap-2 font-semibold text-slate-600"><Sparkles className="h-4 w-4 text-violet-600" /> Deterministic scan · 12 rules active</span>
+                  <button type="button" onClick={onViewDemo} className="shrink-0 font-bold text-violet-700 hover:text-violet-900">Explore demo <span aria-hidden="true">↗</span></button>
                 </div>
+              </div>
+              <div className="absolute -bottom-5 -left-2 hidden items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-xl shadow-slate-300/50 sm:flex lg:-left-8">
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-emerald-100 text-emerald-700"><CircleCheck className="h-5 w-5" /></span>
+                <span><span className="block text-xs font-bold text-slate-900">Fix verified</span><span className="block text-[11px] text-slate-500">Fresh scan passed</span></span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* How It Works — 3-Stage Core Principle */}
-        <section
-          id="how-it-works"
-          className="border-y border-slate-800/80 bg-[#0A0F1D] py-16 px-6 lg:px-12"
-        >
-          <div className="max-w-7xl mx-auto">
-            <div className="max-w-2xl mb-12">
-              <div className="text-xs font-mono text-blue-400 mb-2">
-                Core Architectural Principle
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                Deterministic Detection → Rule Engine → Bounded AI Remediation
-              </h2>
-              <p className="text-sm text-slate-300 mt-3 leading-relaxed">
-                AI never guesses whether a vulnerability exists. Every finding requires
-                verifiable AST, SQL schema, or data-flow evidence before optional AI
-                remediation is invoked.
-              </p>
+        <section id="capabilities" className="scroll-mt-24 px-5 py-16 sm:px-8 lg:px-10 lg:py-24">
+          <div className="mx-auto max-w-7xl">
+            <div className="mx-auto max-w-2xl text-center">
+              <div className="text-xs font-extrabold uppercase tracking-[0.16em] text-violet-700">One privacy workspace</div>
+              <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">Everything from first scan to verified fix</h2>
+              <p className="mt-4 text-base leading-7 text-slate-600">A focused toolkit for developers and security teams to find, understand and resolve privacy risks.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-[#070B14] border border-slate-800 rounded-xl p-6">
-                <div className="text-xs font-mono text-blue-400 mb-2">
-                  01. AST &amp; Schema Parsing
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-2">
-                  Evidence-Based Detection
-                </h3>
-                <p className="text-sm text-slate-300 leading-relaxed mb-4">
-                  Parses Express route handlers, controller parameters, PostgreSQL DDL
-                  tables, and browser storage calls to pinpoint exact file paths and line
-                  numbers where regulated PII is ingested.
-                </p>
-                <div className="text-xs font-mono text-slate-400">
-                  Inputs: TypeScript · JavaScript · PostgreSQL DDL
-                </div>
-              </div>
-
-              <div className="bg-[#070B14] border border-slate-800 rounded-xl p-6">
-                <div className="text-xs font-mono text-violet-400 mb-2">
-                  02. Versioned Rule Engine &amp; Graph
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-2">
-                  PII Lineage &amp; DPDP Triage
-                </h3>
-                <p className="text-sm text-slate-300 leading-relaxed mb-4">
-                  Evaluates code against 12 versioned privacy rules (`rules.json`) and
-                  constructs an interactive directed graph from API Route to Controller,
-                  Database Column, and External Logger/Analytics Sinks.
-                </p>
-                <div className="text-xs font-mono text-slate-400">
-                  Output: Finding ID · Sink Path · Risk Score
-                </div>
-              </div>
-
-              <div className="bg-[#070B14] border border-slate-800 rounded-xl p-6">
-                <div className="text-xs font-mono text-emerald-400 mb-2">
-                  03. Bounded Remediation &amp; Re-Scan
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-2">
-                  Reviewable Diffs &amp; Verification
-                </h3>
-                <p className="text-sm text-slate-300 leading-relaxed mb-4">
-                  Generates a scoped code patch via Gemini API (with deterministic
-                  offline-safe templates). Developers review the side-by-side diff, apply
-                  it in the sandbox, and re-scan to prove the risk is resolved.
-                </p>
-                <div className="text-xs font-mono text-slate-400">
-                  Guardrail: Never auto-merges to production
-                </div>
-              </div>
+            <div className="mt-11 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {capabilities.map((capability) => {
+                const Icon = capability.icon;
+                const toneClasses: Record<string, string> = {
+                  violet: 'bg-violet-100 text-violet-700',
+                  blue: 'bg-blue-100 text-blue-700',
+                  cyan: 'bg-cyan-100 text-cyan-700',
+                  amber: 'bg-amber-100 text-amber-700',
+                  green: 'bg-emerald-100 text-emerald-700',
+                };
+                return (
+                  <article key={capability.title} className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-violet-200 hover:shadow-xl hover:shadow-violet-100/60 sm:p-6">
+                    <div className={`grid h-11 w-11 place-items-center rounded-2xl ${toneClasses[capability.tone]}`}><Icon className="h-5 w-5" /></div>
+                    <h3 className="mt-5 text-base font-bold text-slate-950">{capability.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">{capability.description}</p>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        {/* Capabilities Bento Grid */}
-        <section id="capabilities" className="max-w-7xl mx-auto py-16 px-6 lg:px-12">
-          <div className="max-w-2xl mb-12">
-            <div className="text-xs font-mono text-blue-400 mb-2">
-              Enterprise Platform Capabilities
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Built for Indian Engineering &amp; AppSec Teams
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-[#0C1222] border border-slate-800 rounded-xl p-6">
-              <div className="flex items-center gap-2 text-xs font-mono text-blue-400 mb-2">
-                <Network className="w-4 h-4" />
-                <span>Interactive Data-Flow Graph</span>
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                Trace Aadhaar, PAN, Phone &amp; Email Across Every Service Boundary
-              </h3>
-              <p className="text-sm text-slate-300 leading-relaxed mb-4">
-                Visualize how personal identifiers enter through Express API endpoints,
-                pass through controllers, persist in PostgreSQL tables, and leak into
-                unredacted stdout logs, Sentry crash payloads, or third-party marketing
-                pixels.
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-800 text-xs font-mono">
-                <div>
-                  <span className="text-slate-400 block">Entry Nodes</span>
-                  <span className="text-white">REST Routes &amp; Client</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">Processing</span>
-                  <span className="text-white">Express Controllers</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">Persistence</span>
-                  <span className="text-white">PostgreSQL &amp; Storage</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">Exfiltration Sinks</span>
-                  <span className="text-rose-400">Logs · Sentry · Pixels</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#0C1222] border border-slate-800 rounded-xl p-6">
-              <div className="flex items-center gap-2 text-xs font-mono text-violet-400 mb-2">
-                <Code2 className="w-4 h-4" />
-                <span>Bounded Code Diffs</span>
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                Side-by-Side Patch Verification
-              </h3>
-              <p className="text-sm text-slate-300 leading-relaxed mb-4">
-                Inspect exact before-and-after code replacements, download standard Git
-                `.patch` files, or apply patches directly to the sandbox repository and
-                re-run the scanner to verify risk reduction.
-              </p>
-              <div className="text-xs font-mono text-slate-400 pt-4 border-t border-slate-800">
-                Supports Gemini 3.8 Flash + Deterministic Templates
-              </div>
-            </div>
-
-            <div className="bg-[#0C1222] border border-slate-800 rounded-xl p-6">
-              <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 mb-2">
-                <Lock className="w-4 h-4" />
-                <span>Self-Auditing Security Center</span>
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                10 Live-Verified Security Controls
-              </h3>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Monitors PrivacyLint&apos;s own defense-in-depth posture: scrypt KDF
-                password hashing, Zod schema validation, RBAC enforcement, rate limiting,
-                HttpOnly signed sessions, and security headers.
-              </p>
-            </div>
-
-            <div className="lg:col-span-2 bg-[#0C1222] border border-slate-800 rounded-xl p-6">
-              <div className="flex items-center gap-2 text-xs font-mono text-amber-400 mb-2">
-                <FileCode2 className="w-4 h-4" />
-                <span>ZIP Archive &amp; Preloaded Sandbox</span>
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                Test Immediately With Preloaded BharatPay Checkout API or Upload Any ZIP
-              </h3>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Includes a realistic multi-file Node.js/Express + PostgreSQL repository
-                containing 12 seeded privacy flaws so judges and security engineers can
-                verify detection, data-flow graphs, patching, and re-scanning in seconds.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Versioned 12 Rules Catalog Preview */}
-        <section
-          id="rule-engine"
-          className="border-t border-slate-800/80 bg-[#0A0F1D] py-16 px-6 lg:px-12"
-        >
-          <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
-              <div>
-                <div className="text-xs font-mono text-blue-400 mb-2">
-                  Versioned Catalog (rules.json v1.2.0)
-                </div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                  12 Deterministic Privacy &amp; Security Rules
-                </h2>
-              </div>
-              <div className="text-xs text-slate-400 max-w-md">
-                Note: Findings provide engineering triage mapped to DPDP Act 2023
-                safeguards and do not constitute formal legal compliance certification.
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {rules.map((rule) => (
-                <div
-                  key={rule.id}
-                  className="bg-[#070B14] border border-slate-800/90 rounded-lg p-4 flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between text-xs font-mono mb-2">
-                      <span className="text-blue-400 font-semibold">{rule.id}</span>
-                      <span
-                        className={
-                          rule.severity === 'Critical'
-                            ? 'text-rose-400'
-                            : rule.severity === 'High'
-                            ? 'text-amber-400'
-                            : rule.severity === 'Medium'
-                            ? 'text-yellow-300'
-                            : 'text-slate-400'
-                        }
-                      >
-                        {rule.severity} Severity
-                      </span>
-                    </div>
-                    <h3 className="text-sm font-semibold text-white mb-1.5">
-                      {rule.name}
-                    </h3>
-                    <p className="text-xs text-slate-400 leading-relaxed mb-3">
-                      {rule.description}
-                    </p>
-                  </div>
-                  <div className="pt-2.5 border-t border-slate-800/80 text-[11px] font-mono text-slate-400 flex items-center justify-between">
-                    <span>{rule.dpdpReference.split('—')[0].trim()}</span>
-                    <span>·</span>
-                    <span className="truncate max-w-[140px]">{rule.affectedSinkType}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Architecture & Tech Stack */}
-        <section
-          id="architecture"
-          className="max-w-7xl mx-auto py-16 px-6 lg:px-12 border-t border-slate-800/80"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-5">
-              <div className="text-xs font-mono text-blue-400 mb-2">
-                Defense-in-Depth Stack
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-4">
-                Privacy-First Full-Stack Architecture
-              </h2>
-              <p className="text-sm text-slate-300 leading-relaxed mb-6">
-                Designed with strict separation between the deterministic AST rule engine,
-                directed graph builder, relational persistence schema, and optional
-                server-side Gemini remediation proxy.
-              </p>
-              <button
-                type="button"
-                onClick={onViewDemo}
-                className="px-5 py-2.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors"
-              >
-                Open Workspace Console
+        <section id="how-it-works" className="scroll-mt-24 bg-[#111027] px-5 py-16 text-white sm:px-8 lg:px-10 lg:py-20">
+          <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-12 lg:items-center">
+            <div className="lg:col-span-4">
+              <div className="text-xs font-extrabold uppercase tracking-[0.16em] text-violet-300">A clear review loop</div>
+              <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">From repository to safer code.</h2>
+              <p className="mt-4 text-sm leading-7 text-slate-300">PrivacyLint keeps detection evidence-based and makes every resolution verifiable.</p>
+              <button type="button" onClick={onViewDemo} className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-violet-900 transition hover:bg-violet-100">
+                Explore the workspace <ArrowRight className="h-4 w-4" />
               </button>
             </div>
+            <div className="grid gap-3 sm:grid-cols-3 lg:col-span-8">
+              {flowSteps.map((step, index) => {
+                const Icon = step.icon;
+                return (
+                  <article key={step.label} className="relative rounded-2xl border border-white/10 bg-white/[0.06] p-5 sm:p-6">
+                    <div className="flex items-center justify-between">
+                      <span className="grid h-11 w-11 place-items-center rounded-2xl bg-violet-400/15 text-violet-200"><Icon className="h-5 w-5" /></span>
+                      <span className="font-mono text-xs font-bold text-violet-300">0{index + 1}</span>
+                    </div>
+                    <h3 className="mt-6 text-sm font-bold text-white">{step.label}</h3>
+                    <p className="mt-2 text-xs leading-5 text-slate-400">{step.detail}</p>
+                    {index < flowSteps.length - 1 && <ArrowRight aria-hidden="true" className="absolute -right-3 top-1/2 z-10 hidden h-5 w-5 -translate-y-1/2 text-violet-300 sm:block" />}
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
 
-            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-[#0C1222] border border-slate-800 rounded-lg p-4">
-                <div className="text-xs font-mono text-blue-400 mb-1">Frontend Layer</div>
-                <div className="text-sm font-semibold text-white mb-1">
-                  React 19 · Tailwind CSS · Recharts · Interactive Flow DAG
-                </div>
-                <div className="text-xs text-slate-400">
-                  High-density enterprise telemetry, side-by-side diff viewer, and
-                  interactive 4-tier PII lineage graph.
-                </div>
+        <section id="trust" className="scroll-mt-24 px-5 py-16 sm:px-8 lg:px-10 lg:py-20">
+          <div className="mx-auto grid max-w-7xl gap-8 rounded-[1.75rem] border border-violet-100 bg-white p-6 shadow-sm sm:p-9 lg:grid-cols-12 lg:items-center">
+            <div className="lg:col-span-5">
+              <div className="flex items-center gap-3">
+                <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-100 text-emerald-700"><ShieldCheck className="h-5 w-5" /></span>
+                <div className="text-xs font-extrabold uppercase tracking-[0.15em] text-emerald-700">Built for trustworthy reviews</div>
               </div>
-              <div className="bg-[#0C1222] border border-slate-800 rounded-lg p-4">
-                <div className="text-xs font-mono text-violet-400 mb-1">
-                  Analysis &amp; API Layer
-                </div>
-                <div className="text-sm font-semibold text-white mb-1">
-                  AST Rule Scanner · Express API · Python FastAPI Scaffold
-                </div>
-                <div className="text-xs text-slate-400">
-                  Deterministic source inspection (`src/engine/scanner.ts`) + reference
-                  Tree-sitter/NetworkX scaffold (`backend_scaffold/main.py`).
-                </div>
-              </div>
-              <div className="bg-[#0C1222] border border-slate-800 rounded-lg p-4">
-                <div className="text-xs font-mono text-emerald-400 mb-1">
-                  Security &amp; RBAC Layer
-                </div>
-                <div className="text-sm font-semibold text-white mb-1">
-                  scrypt/Argon2 KDF · Zod Validation · Signed HttpOnly Sessions
-                </div>
-                <div className="text-xs text-slate-400">
-                  Enforces Admin, Security Analyst, and Developer permissions on backend
-                  routes with pseudonymized audit logs.
-                </div>
-              </div>
-              <div className="bg-[#0C1222] border border-slate-800 rounded-lg p-4">
-                <div className="text-xs font-mono text-amber-400 mb-1">
-                  Database &amp; AI Remediation
-                </div>
-                <div className="text-sm font-semibold text-white mb-1">
-                  PostgreSQL Schema (`schema.sql`) · Gemini 3.8 Flash Proxy
-                </div>
-                <div className="text-xs text-slate-400">
-                  Server-side `@google/genai` integration with structured JSON schemas and
-                  offline-safe deterministic remediation templates.
-                </div>
-              </div>
+              <h2 className="mt-5 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">AI can help with a fix. Evidence decides the finding.</h2>
+              <p className="mt-4 text-sm leading-7 text-slate-600">The scanner uses deterministic rules. Suggested patches stay reviewable, and a fresh sandbox scan must pass before a finding is resolved.</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:col-span-7">
+              {[
+                { icon: KeyRound, title: 'Role-based access', body: 'Admin, Security Analyst and Developer roles.' },
+                { icon: LockKeyhole, title: 'Protected sessions', body: 'Hashed passwords and signed HttpOnly cookies.' },
+                { icon: Upload, title: 'Practical intake', body: 'Connect GitHub or upload a source ZIP.' },
+                { icon: Database, title: 'DPDP-aware workflow', body: 'Findings mapped for engineering triage.' },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.title} className="flex gap-3 rounded-2xl bg-slate-50 p-4">
+                    <span className="mt-0.5 text-violet-700"><Icon className="h-4 w-4" /></span>
+                    <div><h3 className="text-sm font-bold text-slate-900">{item.title}</h3><p className="mt-1 text-xs leading-5 text-slate-600">{item.body}</p></div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="px-5 pb-20 sm:px-8 lg:px-10">
+          <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 rounded-[1.75rem] bg-gradient-to-r from-violet-700 to-indigo-700 p-7 text-white shadow-xl shadow-violet-200 sm:flex-row sm:items-center sm:p-10">
+            <div>
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-violet-200">Start with a scan</p>
+              <h2 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">Know where personal data goes.</h2>
+              <p className="mt-2 text-sm text-violet-100">Review a sample workspace or sign in to your team workspace.</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button type="button" onClick={onViewDemo} className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-violet-800 transition hover:bg-violet-50">Open demo <ArrowRight className="h-4 w-4" /></button>
+              <button type="button" onClick={() => onOpenAuth('login')} className="rounded-full border border-white/40 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10">Admin login</button>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Quiet Footer */}
-      <footer className="border-t border-slate-800/80 bg-[#050810] px-6 lg:px-12 py-8">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-blue-500" />
-            <span className="font-semibold text-slate-200">PrivacyLint</span>
-            <span>·</span>
-            <span>Find Privacy Risks Before They Become Breaches.</span>
-          </div>
-          <div className="flex items-center gap-6">
-            <button
-              type="button"
-              onClick={onViewDemo}
-              className="hover:text-white transition-colors"
-            >
-              Interactive Demo
-            </button>
-            <button
-              type="button"
-              onClick={() => onOpenAuth('login')}
-              className="hover:text-white transition-colors"
-            >
-              Sign In
-            </button>
-            <span>Engineering Triage Prototype · DPDP Act 2023</span>
-          </div>
+      <footer className="border-t border-slate-200 bg-white px-5 py-7 sm:px-8 lg:px-10">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-xs text-slate-500 sm:flex-row">
+          <a href="#top" className="flex items-center gap-2 font-bold text-slate-800"><span className="grid h-7 w-7 place-items-center rounded-lg bg-violet-700 text-white"><Shield className="h-4 w-4" /></span> PrivacyLint</a>
+          <span>Privacy risk analysis for modern application teams · DPDP Act 2023 mapping</span>
+          <button type="button" onClick={() => onOpenAuth('login')} className="font-bold text-violet-700 hover:text-violet-900">Sign in to workspace</button>
         </div>
       </footer>
     </div>
